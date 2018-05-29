@@ -8,22 +8,10 @@ import android.util.Log
 import com.dew.edward.fragmentsharedata.fragments.VideoIntentFragment
 import com.dew.edward.fragmentsharedata.fragments.VideoViewFragment
 
-class MainActivity : AppCompatActivity(), VideoIntentFragment.OnFragmentVideoUriListener {
+class MainActivity : AppCompatActivity(){
 
     private val TAG = MainActivity::class.qualifiedName
 
-    override fun onFragmentVideoUri(uri: Uri?) {
-
-        Log.v(TAG, "video uri: $uri")
-        uri?.let {
-            val videoViewFragment = VideoViewFragment.newInstance(it)
-            replaceFragment(videoViewFragment)
-        }
-//        if (uri != null) {
-//            val videoViewFragment = VideoViewFragment.newInstance(uri)
-//            replaceFragment(videoViewFragment)
-//        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

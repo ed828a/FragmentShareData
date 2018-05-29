@@ -1,14 +1,17 @@
 package com.dew.edward.fragmentsharedata.fragments
 
 
+import android.arch.lifecycle.ViewModelProviders
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
 import com.dew.edward.fragmentsharedata.R
+import com.dew.edward.fragmentsharedata.viewmodel.FragmentViewModel
 import kotlinx.android.synthetic.main.fragment_video_view.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -22,26 +25,19 @@ private const val VID_URI = "video uri"
  *
  */
 class VideoViewFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var videoUri: Uri? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        if (arguments != null){
-//            videoUri = arguments?.getParcelable(VID_URI)
-//        }
-        //same as above
-        arguments?.let {
-            videoUri = it.getParcelable(VID_URI)
-        }
+    // videoMode will provide this videoUri
+    private val videoUriViewModel by lazy {
+        ViewModelProviders.of(activity!!).get(FragmentViewModel::class.java)
     }
 
     override fun onStart() {
         super.onStart()
+        if (videoUriViewModel.videoUri != null) {
+            Log.v(TAG, "videoUriViewModel: ${videoUriViewModel.videoUri.toString()}")
 
-        videoView.setVideoURI(videoUri)
-        videoView.start()
+            videoView.setVideoURI(videoUriViewModel.videoUri)
+            videoView.start()
+        }
     }
 
     override fun onPause() {
@@ -72,23 +68,11 @@ class VideoViewFragment : Fragment() {
          * @param param1 Parameter 1.
          * @return A new instance of fragment VideoViewFragment.
          */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: Uri) =
-                VideoViewFragment().apply {
-                    arguments = Bundle().apply {
-                        putParcelable(VID_URI, param1)
-                    }
-                }
 
-        // it's same as below
-        fun newInstance2(uri: Uri): VideoViewFragment {
-            val fragment = VideoViewFragment()
-            val args = Bundle()
-            args.putParcelable(VID_URI, uri)
-            fragment.arguments = args
-            return fragment
-        }
+        @JvmStatic
+        fun newInstance() = VideoViewFragment()
+
+
 
 
 

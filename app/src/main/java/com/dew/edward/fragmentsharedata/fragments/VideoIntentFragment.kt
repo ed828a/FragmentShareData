@@ -1,6 +1,8 @@
 package com.dew.edward.fragmentsharedata.fragments
 
 import android.app.Activity.RESULT_OK
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -13,6 +15,9 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.dew.edward.fragmentsharedata.R
+import com.dew.edward.fragmentsharedata.R.id.buttonPlay
+import com.dew.edward.fragmentsharedata.R.id.buttonRecord
+import com.dew.edward.fragmentsharedata.viewmodel.FragmentViewModel
 import kotlinx.android.synthetic.main.fragment_video_intent.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -33,9 +38,9 @@ class VideoIntentFragment : Fragment() {
 
     private var videoUri: Uri? = null
     private val VIDEO_APP_REQUEST_CODE = 1000
-
-    private var videoUriListener: OnFragmentVideoUriListener? = null
-
+    private val videoUriViewModel by lazy {
+        activity?.let { ViewModelProviders.of(it).get(FragmentViewModel::class.java) }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -43,6 +48,15 @@ class VideoIntentFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_video_intent, container, false)
     }
 
+    private fun startVideoViewFragment(){
+        val videoViewFragment = VideoViewFragment.newInstance()
+        val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
+        fragmentTransaction?.apply {
+            replace(R.id.fragmentContainer, videoViewFragment)
+            addToBackStack(null)
+            commit()
+        }
+    }
     // send data to Activity
     private fun callVideoApp(){
         val videoCaptureIntent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
@@ -72,28 +86,12 @@ class VideoIntentFragment : Fragment() {
         }
 
         buttonPlay.setOnClickListener {
-            // here this fragment passes videoUir to the activity
-            videoUriListener?.onFragmentVideoUri(videoUri) }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnFragmentVideoUriListener) {
-            videoUriListener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
+            // ViewModel will pass the videoUri to the VideoViewFragment
+            videoUri?.let {
+                videoUriViewModel?.videoUri = it
+            }
+            startVideoViewFragment()
         }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        videoUriListener = null
-    }
-
-
-    interface OnFragmentVideoUriListener {
-        // using this function to pass data to calling activity
-        fun onFragmentVideoUri(uri: Uri?)
     }
 
     companion object {
